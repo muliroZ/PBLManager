@@ -9,20 +9,20 @@
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-green?style=for-the-badge)
 
 ## 📖 Introdução
-O **PBL Manager** (Project-Based Learning Manager) é um ecossistema digital focado na estruturação, acompanhamento e avaliação de projetos acadêmicos que adotam metodologias ativas de ensino. Desenvolvido com base em um robusto banco de dados relacional, o sistema visa organizar a complexidade do trabalho colaborativo, oferecendo rastreabilidade de entregas, avaliações 360 e um histórico institucional.
+O **PBL Manager** (Project-Based Learning Manager) é um ecossistema digital focado na estruturação, acompanhamento e avaliação de projetos acadêmicos que adotam metodologias ativas de ensino. Desenvolvido com base em um robusto banco de dados relacional, o sistema visa organizar a complexidade do trabalho colaborativo, oferecendo rastreabilidade de entregas e um histórico institucional.
 
 ## 🎯 Objetivo
 Em vez do modelo tradicional, a Aprendizagem Baseada em Projetos (PBL) foca na resolução prática de problemas do mundo real em equipe. O banco de dados do PBL Manager tem o objetivo de resolver desafios complexos de gestão como:
 - Relacionamentos complexos entre alunos, grupos, turmas e projetos.
-- Auto-relacionamentos (ex: monitoria entre alunos).
 - Versionamento histórico de entregas e submissões (evitando perda de dados através de rastreabilidade de refatoração).
 - Mapeamento de tecnologias e avaliações de feedback.
+- Feedbacks do professor nas versões do projeto.
 
 ## 🛠️ Stack de Tecnologias
 - **SGBD:** PostgreSQL (Relacional)
 - **Infraestrutura:** Docker e Docker Compose (Isolamento de ambiente)
-- **Modelagem:** ERDPlus e BrModelo (Modelo Conceitual e Relacional)
-- **Cliente DB:** DBeaver (Gestão Universal e Consultas DML/DDL)
+- **Modelagem:** ERDPlus (Modelo Conceitual e Relacional)
+- **Cliente DB:** PgAdmin (Gestão do PostgreSQL e Consultas DML/DDL)
 
 ## 📁 Estrutura do Projeto
 
