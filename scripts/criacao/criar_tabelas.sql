@@ -170,6 +170,7 @@ CREATE TABLE sprint (
 CREATE TABLE entrega (
   id INT NOT NULL,
   titulo VARCHAR NOT NULL,
+  status VARCHAR DEFAULT 'Avaliação pendente',
   id_equipe INT,
   id_projeto INT,
   id_sprint INT,
@@ -199,6 +200,7 @@ CREATE TABLE versao (
 CREATE TABLE feedback (
   id INT NOT NULL,
   descricao VARCHAR NOT NULL,
+  nota DECIMAL DEFAULT 0.0,
   id_professor INT,
   id_equipe INT,
   id_projeto INT,
