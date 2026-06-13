@@ -185,7 +185,7 @@ CREATE TABLE entrega (
 CREATE TABLE versao (
   id INT NOT NULL,
   link_repositorio VARCHAR NOT NULL,
-  data_submissao DATE NOT NULL,
+  data_submissao DATE DEFAULT CURRENT_DATE,
   id_equipe INT,
   id_projeto INT,
   id_sprint INT,
