@@ -58,7 +58,7 @@ cp .env.example .env
 ```
 
 Preencha as variáveis de ambiente do arquivo .env após copiar
-> **Nota:** O valor da variável `PGADMIN_DEFAULT_PASSWORD` deve ser preenchido no padrão 'xxx@xxx.com'. O valor das variáveis de ambiente restantes é arbitrário, preencha como quiser.
+> **Nota:** O valor da variável `PGADMIN_DEFAULT_EMAIL` deve ser preenchido no padrão 'xxx@xxx.com'. O valor das variáveis de ambiente restantes é arbitrário, preencha como quiser.
 
 ```bash
 # 2. Inicie o container do banco:
