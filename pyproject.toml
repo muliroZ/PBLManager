@@ -10,5 +10,6 @@ dependencies = []
 dev = [
     "psycopg2-binary>=2.9.12",
     "pytest>=9.0.3",
+    "python-dotenv>=1.2.2",
     "testcontainers-postgres>=0.0.1rc1",
 ]

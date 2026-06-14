@@ -2,27 +2,28 @@ CREATE OR REPLACE FUNCTION trg_fnc_analisar_feedback()
 RETURNS TRIGGER AS $$
 DECLARE
     v_nota DECIMAL;
+    v_id_entrega INT;
 BEGIN
     SELECT nota INTO v_nota
     FROM feedback
     WHERE id = NEW.id;
 
+    SELECT id_entrega INTO v_id_entrega
+    FROM versao
+    WHERE id = NEW.id_versao;
+
     IF v_nota >= 8.0 THEN
         UPDATE entrega
         SET status = 'Aprovado'
-        WHERE id = NEW.id_entrega;
-    end if;
-
-    IF v_nota >= 4.0 AND v_nota < 8.0 THEN
+        WHERE id = v_id_entrega;
+    ELSIF v_nota >= 4.0 AND v_nota < 8.0 THEN
         UPDATE entrega
         SET status = 'Necessita de ajustes'
-        WHERE id = NEW.id_entrega;
-    END IF;
-
-    IF v_nota < 4.0 THEN
+        WHERE id = v_id_entrega;
+    ELSE
         UPDATE entrega
         SET status = 'Reprovado'
-        WHERE id = NEW.id_entrega;
+        WHERE id = v_id_entrega;
     END IF;
 
     RETURN NULL;
