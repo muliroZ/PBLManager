@@ -213,42 +213,50 @@ INSERT INTO sprint (id, numero, data_fim, id_projeto, id_equipe) VALUES
 (9, 1, '2026-03-15', 505, 405),
 (10, 2, '2026-03-30', 505, 405);
 
--- As Entregas
--- Cadastrando os entregáveis planejados para as primeiras Sprints
-INSERT INTO entrega (id, titulo, id_equipe, id_projeto, id_sprint) VALUES 
-(10, 'Documento de Requisitos e Escopo', 401, 501, 1),
-(11, 'Modelagem Relacional (DER) e DDL', 401, 501, 2),
-(12, 'Protótipo de Telas de Login e Menu', 402, 502, 3),
-(13, 'Arquitetura de Microsserviços base', 403, 503, 5),
-(14, 'Mapeamento de APIs de Pagamento', 404, 504, 7);
-
--- Cadastrando os links dos repositórios do GitHub correspondentes a cada entrega
-INSERT INTO versao (id, link_repositorio, data_submissao, id_equipe, id_projeto, id_sprint, id_entrega) VALUES 
-(1001, 'https://github.com/upe/massa-puba-requisitos', '2026-03-14', 401, 501, 1, 10),
-(1002, 'https://github.com/upe/massa-puba-der-sql', '2026-03-29', 401, 501, 2, 11),
-(1003, 'https://github.com/upe/plataforma-wireframes', '2026-03-15', 402, 502, 3, 12),
-(1004, 'https://github.com/upe/monitoria-core-infra', '2026-03-13', 403, 503, 5, 13),
-(1005, 'https://github.com/upe/ecommerce-vendas-api', '2026-03-14', 404, 504, 7, 14);
-
--- Feedbacks
--- Avaliações feitas pelos professores (IDs de 1 a 10) sobre os códigos/links enviados
-INSERT INTO feedback (id, descricao, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao) VALUES 
-(50, 'Escopo bem definido, mas a restrição de unicidade do e-commerce precisa ser revista.', 1, 401, 501, 1, 10, 1001),
-(51, 'Excelente modelagem física de dados. Scripts DDL limpos e organizados.', 1, 401, 501, 2, 11, 1002),
-(52, 'Falta incluir o fluxo de recuperação de senha no protótipo de telas.', 2, 402, 502, 3, 12, 1003),
-(53, 'Configuração do Docker Compose está excelente. Infraestrutura validada.', 3, 403, 503, 5, 13, 1004);
-
--- Critérios de aceitação
--- Regras específicas de correção atreladas aos feedbacks dados
-INSERT INTO criterio_aceitacao (id, descricao, peso, id_feedback, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao) VALUES 
-(1, 'Garantir validação de e-mails corporativos únicos', 2.0, 50, 1, 401, 501, 1, 10, 1001),
-(2, 'Adicionar índices nas chaves estrangeiras mais consultadas', 3.0, 51, 1, 401, 501, 2, 11, 1002),
-(3, 'Criar tela de fluxo alternativo para esqueci minha senha', 1.5, 52, 2, 402, 502, 3, 12, 1003),
-(4, 'Otimizar o tamanho da imagem base do microsserviço no Dockerfile', 2.5, 53, 3, 403, 503, 5, 13, 1004);
-
+-- ===============================================================
+-- 5. AS ENTREGAS (Corrigido para 3FN)
+-- ID, Titulo, status (default), id_sprint, id_equipe
+-- ===============================================================
+INSERT INTO entrega (id, titulo, id_sprint, id_equipe) VALUES 
+(10, 'Documento de Requisitos e Escopo', 1, 401),
+(11, 'Modelagem Relacional (DER) e DDL', 2, 401),
+(12, 'Protótipo de Telas de Login e Menu', 3, 402),
+(13, 'Arquitetura de Microsserviços base', 5, 403),
+(14, 'Mapeamento de APIs de Pagamento', 7, 404);
 
 -- ===============================================================
--- AS TECNOLOGIAS AOS PROJETOS 
+-- 6. AS VERSÕES (Corrigido para 3FN)
+-- ID, Link, Data_submissao, id_entrega
+-- ===============================================================
+INSERT INTO versao (id, link_repositorio, data_submissao, id_entrega) VALUES 
+(1001, 'https://github.com/upe/massa-puba-requisitos', '2026-03-14', 10),
+(1002, 'https://github.com/upe/massa-puba-der-sql', '2026-03-29', 11),
+(1003, 'https://github.com/upe/plataforma-wireframes', '2026-03-15', 12),
+(1004, 'https://github.com/upe/monitoria-core-infra', '2026-03-13', 13),
+(1005, 'https://github.com/upe/ecommerce-vendas-api', '2026-03-14', 14);
+
+-- ===============================================================
+-- 7. OS FEEDBACKS (Corrigido para 3FN)
+-- ID, Descricao, Nota (default), id_professor, id_versao
+-- ===============================================================
+INSERT INTO feedback (id, descricao, nota, id_professor, id_versao) VALUES 
+(50, 'Escopo bem definido, mas a restrição de unicidade do e-commerce precisa ser regra.', 8.5, 1, 1001),
+(51, 'Excelente modelagem física de dados. Scripts DDL limpos e organizados.', 9.5, 1, 1002),
+(52, 'Falta incluir o fluxo de recuperação de senha no protótipo de telas.', 7.0, 2, 1003),
+(53, 'Configuração do Docker Compose está excelente. Infraestrutura validada.', 10.0, 3, 1004);
+
+-- ===============================================================
+-- 8. OS CRITÉRIOS DE ACEITAÇÃO (Corrigido para 3FN)
+-- ID, Descricao, Peso, id_feedback
+-- ===============================================================
+INSERT INTO criterio_aceitacao (id, descricao, peso, id_feedback) VALUES 
+(1, 'Garantir validação de e-mails corporativos únicos', 2.0, 50),
+(2, 'Adicionar índices nas chaves estrangeiras mais consultadas', 3.0, 51),
+(3, 'Criar tela de fluxo alternativo para esqueci minha senha', 1.5, 52),
+(4, 'Otimizar o tamanho da imagem base do microsserviço no Dockerfile', 2.5, 53);
+
+-- ===============================================================
+-- AS TECNOLOGIAS AO PROJETO 
 -- ===============================================================
 INSERT INTO projeto_tecnologia (id_projeto, id_tecnologia, categoria, versao) VALUES 
 (501, 1, 'Banco de Dados', 'PostgreSQL 18'),
@@ -260,4 +268,4 @@ INSERT INTO projeto_tecnologia (id_projeto, id_tecnologia, categoria, versao) VA
 (504, 7, 'Infraestrutura Cloud', 'AWS'), 
 (504, 8, 'Backend Framework', 'NestJS v10'),
 (505, 9, 'Linguagem Core', 'Haskell GHC 9.4'), 
-(505, 10, 'Frontend Framework', 'Vue.js 3.0');   
+(505, 10, 'Frontend Framework', 'Vue.js 3.0'); 
