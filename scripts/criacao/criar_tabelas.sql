@@ -151,82 +151,62 @@ CREATE TABLE projeto_tecnologia (
 );
 
 -- ===============================
--- Tabela de Sprints (Entidade Fraca)
+-- Tabela de Sprints (Entidade Fraca) (Normalizada 3FN)
 -- ===============================
 CREATE TABLE sprint (
-  id INT NOT NULL,
+  id INT PRIMARY KEY, -- Surrogate Key
   numero INT NOT NULL,
   data_fim DATE NOT NULL,
-  id_projeto INT,
+  id_projeto INT NOT NULL,
   id_equipe INT,
-  PRIMARY KEY (id_projeto, id),
   FOREIGN KEY (id_projeto) REFERENCES projeto(id),
   FOREIGN KEY (id_equipe) REFERENCES equipe(id)
 );
 
 -- ===============================
--- Tabela de Entregas (Entidade Fraca)
+-- Tabela de Entregas (Entidade Fraca) (Normalizada 3FN)
 -- ===============================
 CREATE TABLE entrega (
-  id INT NOT NULL,
+  id INT PRIMARY KEY,
   titulo VARCHAR NOT NULL,
   status VARCHAR DEFAULT 'Avaliação pendente',
-  id_equipe INT,
-  id_projeto INT,
-  id_sprint INT,
-  PRIMARY KEY (id_equipe, id_projeto, id_sprint, id),
-  FOREIGN KEY (id_equipe) REFERENCES equipe(id),
-  FOREIGN KEY (id_projeto, id_sprint) REFERENCES sprint(id_projeto, id)
+  id_sprint INT NOT NULL,
+  id_equipe INT NOT NULL,
+  FOREIGN KEY (id_sprint) REFERENCES sprint(id),
+  FOREIGN KEY (id_equipe) REFERENCES equipe(id)
 );
 
 -- ===============================
--- Tabela de Versões (Entidade Fraca)
+-- Tabela de Versões (Entidade Fraca) (Normalizada 3FN)
 -- ===============================
 CREATE TABLE versao (
-  id INT NOT NULL,
+  id INT PRIMARY KEY,
   link_repositorio VARCHAR NOT NULL,
   data_submissao DATE DEFAULT CURRENT_DATE,
-  id_equipe INT,
-  id_projeto INT,
-  id_sprint INT,
-  id_entrega INT,
-  PRIMARY KEY (id_equipe, id_projeto, id_sprint, id_entrega, id),
-  FOREIGN KEY (id_equipe, id_projeto, id_sprint, id_entrega) REFERENCES entrega(id_equipe, id_projeto, id_sprint, id)
+  id_entrega INT NOT NULL,
+  FOREIGN KEY (id_entrega) REFERENCES entrega(id)
 );
 
 -- ===============================
--- Tabela de Feedbacks (Entidade Fraca)
+-- Tabela de Feedbacks (Entidade Fraca) (Normalizada 3FN)
 -- ===============================
 CREATE TABLE feedback (
-  id INT NOT NULL,
+  id INT PRIMARY KEY,
   descricao VARCHAR NOT NULL,
   nota DECIMAL DEFAULT 0.0,
-  id_professor INT,
-  id_equipe INT,
-  id_projeto INT,
-  id_sprint INT,
-  id_entrega INT,
-  id_versao INT,
-  PRIMARY KEY (id, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao),
+  id_professor INT NOT NULL,
+  id_versao INT NOT NULL,
   FOREIGN KEY (id_professor) REFERENCES professor(id),
-  FOREIGN KEY (id_equipe, id_projeto, id_sprint, id_entrega, id_versao) REFERENCES versao(id_equipe, id_projeto, id_sprint, id_entrega, id)
+  FOREIGN KEY (id_versao) REFERENCES versao(id)
 );
 
 -- ===============================
--- Tabela de Critérios de Aceitação (Entidade Fraca)
+-- Tabela de Critérios de Aceitação (Entidade Fraca) (Normalizada 3FN)
 -- ===============================
 CREATE TABLE criterio_aceitacao (
-  id INT NOT NULL,
+  id INT PRIMARY KEY,
   descricao VARCHAR NOT NULL,
   peso FLOAT NOT NULL,
-  id_feedback INT,
-  id_professor INT,
-  id_equipe INT,
-  id_projeto INT,
-  id_sprint INT,
-  id_entrega INT,
-  id_versao INT,
-  PRIMARY KEY (id_feedback, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao, id),
-  FOREIGN KEY (id_feedback, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao) 
-    REFERENCES feedback(id, id_professor, id_equipe, id_projeto, id_sprint, id_entrega, id_versao)
+  id_feedback INT NOT NULL, 
+  FOREIGN KEY (id_feedback) REFERENCES feedback(id)
 );
