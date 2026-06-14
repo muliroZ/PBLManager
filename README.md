@@ -24,15 +24,73 @@ Em vez do modelo tradicional, a Aprendizagem Baseada em Projetos (PBL) foca na r
 - **Modelagem:** ERDPlus (Modelo Conceitual e Relacional)
 - **Cliente DB:** PgAdmin (Gestão do PostgreSQL e Consultas DML/DDL)
 
+## 📋 Checklist de Requisitos do Projeto (Critérios de Avaliação)
+Mapeamento dos requisitos obrigatórios cumpridos de acordo com as diretrizes da disciplina:
+
+- [x] **Divisão de Grupos (no máximo 4 pessoas):** Controlado de forma estrita via Triggers no banco de dados.
+- [x] **Projeto de Banco de Dados Normalizado (40%):** Modelos Conceitual e Relacional projetados sem redundâncias estruturais.
+- [x] **Estrutura de Tabelas (30%):** Mais de 20 tabelas e views estruturadas de forma coesa.
+- [x] **Camada de Inteligência Funcional (30%):** Conjunto completo de Views, Triggers e Procedures operacionais.
+- [x] **Seeders para População (10%):** Scripts SQL de inserts realistas automatizados para testes de concorrência e amostragem.
+- [x] **Testes a Nível de Aplicação (10%):** Suíte de testes automatizados escrita em Python com `pytest`.
+- [x] **Documentação Completa (10%):** Regras de negócio mapeadas e README atualizado.
+
+## 🛠️ Inteligência Programada (Backend SQL)
+
+### 📈 Views Analíticas
+
+* `vw_visao_geral_equipes`: Consolida os dados cruciais das equipes, seus respectivos projetos, turmas e disciplinas para acompanhamento macro do professor.
+* `vw_acompanhamento_sprints`: Mapeia de forma cronológica as sprints vigentes, datas limites e o progresso associado.
+* `vw_feedbacks_e_criterios`: Reúne as avaliações feitas pelos professores, as notas aplicadas e as descrições dos critérios de aceitação vinculados.
+
+### ⚙️ Procedures e Automações
+
+* `matricular_aluno_turma`: Processa inscrições de alunos garantindo a integridade e limitando o máximo de 40 matrículas por turma.
+* `criar_proxima_sprint`: Facilita o desdobramento ágil ao criar de forma sequencial o próximo ciclo temporal de um projeto.
+* `reprovar_por_falta_evasao`: Atualiza massivamente o status acadêmico de discentes que abandonaram ou não se integraram aos fluxos do PBL.
+
+### 🔒 Triggers de Integridade
+
+* `trg_restricao_aluno_equipes`: Garante em nível de banco que nenhum aluno consiga fazer parte de mais de uma equipe dentro da mesma turma.
+* `trg_garantia_aluno_matriculado`: Bloqueia tentativas de alocar um aluno em uma equipe se ele não possuir vínculo de matrícula ativo na turma correspondente.
+* `trg_mudanca_status_por_feedback`: Analisa a inserção de notas. Atribui automaticamente status de *Aprovado* (Nota ≥ 8.0), *Necessita de ajustes* (Nota entre 4.0 e 7.9) ou *Reprovado* (Nota < 4.0) à respectiva entrega.
 ## 📁 Estrutura do Projeto
 
 ```ini
 PBLManager/
 ├── .env.example                       # Variáveis de ambiente de exemplo
 ├── docker-compose.yml                 # Orquestração do PostgreSQL via Docker
+├── diagramas/
+│   ├── Modelo Conceitual.pdf          # Diagrama Entidade-Relacionamento (DER)
+│   └── Modelo Relacional.pdf          # Diagrama Relacional/Lógico
+├── docs/
+│   ├── Captura de tela 2026-06-04 205608.png  # Diretrizes de avaliação
+│   └── PBL Manager.pdf                # Regras de negócio e escopo detalhado
 ├── scripts/
-│   └── criação/
-│       └── criar_tabelas.sql          # Scripts DDL das 20 tabelas estruturadas
+│   ├── criacao/
+│   │   └── criar_tabelas.sql          # Script DDL das 20 tabelas principais
+│   ├── consulta/
+│   │   ├── consulta01.sql             # Consultas pontuais de testes
+│   │   ├── scripts_principais_consultas.sql # Queries avançadas do ecossistema
+│   │   ├── vw_acompanhamento_sprints.sql    # View de controle de prazos por ciclo
+│   │   ├── vw_feedbacks_e_criterios.sql     # View de notas e critérios de aceitação
+│   │   └── vw_visao_geral_equipes.sql       # View analítica consolidada de equipes
+│   ├── functions/
+│   │   ├── func_Alunos_Em_Turma.sql   # Contador de densidade por sala
+│   │   ├── func_busca_link_GitHub.sql # Localizador de artefatos por versão
+│   │   ├── func_obter_Média_Equipe.sql# Cálculo de média ponderada de notas
+│   │   ├── func_Professor_Por_Id.sql  # Captura nominal de orientadores
+│   │   └── func_Sprints_Projeto.sql   # Mapeador de ciclos por escopo
+│   ├── seeds/
+│   │   ├── procedures/
+│   │   │   ├── criar_proxima_sprint.sql     # Gerador automatizado de cronograma
+│   │   │   ├── matricular_aluno_turma.sql   # Validador de limite de vagas (máx 40)
+│   │   │   └── reprovar_por_falta_evasao.sql# Rotina de atualização de status
+│   │   └── popular_tabelas.sql        # Ingestão de dados realistas (DML)
+│   └── triggers/
+│       ├── trg_garantia_aluno_matriculado.sql # Restringe alocações ilegítimas
+│       ├── trg_mudanca_status_por_feedback.sql# Automação de status da entrega por nota
+│       └── trg_restricao_aluno_equipes.sql    # Impede duplicidade de aluno em equipes
 ├── diagramas/
 │   ├── Modelo Conceitual.pdf          # Diagrama Entidade-Relacionamento
 │   └── Modelo Relacional.pdf          # Diagrama Relacional (Lógico)
@@ -107,12 +165,6 @@ docker exec -i pg_docker psql -U seu_usuario -d nome_banco < scripts/criacao/cri
 # PowerShell
 Get-Content .\scripts\criacao\criar_tabelas.sql | docker exec -i pg_docker psql -U seu_usuario -d nome_banco
 ```
-
-## ✨ Próximos Passos (Roadmap)
-
-* [ ] Construir os *Seeders* para popular o banco de dados com dados de teste.
-* [ ] Desenvolver as Views e Procedures (regras de negócio e relatórios complexos).
-* [ ] Implementar Triggers para as restrições de integridade complexas (ex: limite de alunos no grupo).
 
 ## 👨‍💻 Créditos
 
