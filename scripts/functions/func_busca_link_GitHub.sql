@@ -4,11 +4,13 @@ RETURNS VARCHAR AS $$
 DECLARE
     link_git VARCHAR;
 BEGIN
-    SELECT link_repositorio INTO link_git
-    FROM versao
-    WHERE id_equipe = codigo_equipe 
-      AND id_projeto = codigo_projeto
-    ORDER BY data_submissao DESC
+    SELECT v.link_repositorio INTO link_git
+    FROM versao v
+    INNER JOIN entrega e ON v.id_entrega = e.id
+    INNER JOIN sprint s ON e.id_sprint = s.id
+    WHERE e.id_equipe = codigo_equipe 
+      AND s.id_projeto = codigo_projeto
+    ORDER BY v.data_submissao DESC
     LIMIT 1;
 
     RETURN COALESCE(link_git, 'Nenhum repositório enviado ainda.');

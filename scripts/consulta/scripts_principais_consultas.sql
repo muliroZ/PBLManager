@@ -19,15 +19,16 @@ INNER JOIN membro_equipe me ON a.id = me.id_aluno
 INNER JOIN equipe e ON me.id_equipe = e.id
 ORDER BY e.id, u.nome_completo;
 
--- lista quais Projetos e Tecnologiuas cada equipe está usando
+-- Lista quais Projetos e Tecnologias cada equipe está usando 
 SELECT 
     e.id AS codigo_equipe,
     p.nome AS nome_do_projeto,
     t.nome AS tecnologia_utilizada,
-    pt.categoria AS camada_da_stack
+    pt.categoria AS camada_da_stack,
+    pt.versao AS versao_tecnologica
 FROM equipe e
 INNER JOIN equipe_projeto ep ON e.id = ep.id_equipe
 INNER JOIN projeto p ON ep.id_projeto = p.id
 INNER JOIN projeto_tecnologia pt ON p.id = pt.id_projeto
 INNER JOIN tecnologia t ON pt.id_tecnologia = t.id
-ORDER BY e.id;
+ORDER BY e.id, pt.categoria;
