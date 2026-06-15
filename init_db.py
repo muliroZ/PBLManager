@@ -40,6 +40,8 @@ def execute_sql_file(cursor, file_path):
         raise e
 
 def main():
+    conn = None
+    cursor = None
     base_dir = Path(__file__).parent
 
     try:

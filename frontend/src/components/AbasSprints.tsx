@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { type SprintDetalhada } from "../types/sprints";
+import { ListaEntregas } from "./ListaEntregas";
 
 interface AbasSprintProps {
     codigoEquipe: number;
@@ -69,36 +70,7 @@ export function AbasSprints({ codigoEquipe }: AbasSprintProps) {
                 <p><strong>Prazo de Entrega:</strong> {new Date(dadosDaSprintSelecionada.prazo_sprint).toLocaleDateString()}</p>
                 
                 <h4>Entregas efetuadas nesta Sprint:</h4>
-                {dadosDaSprintSelecionada.entregas.length === 0 || !dadosDaSprintSelecionada.entregas[0].titulo_entrega ? (
-                    <p style={{ color: '#666', fontStyle: 'italic' }}>Nenhuma entrega submetida até ao momento.</p>
-                ) : (
-                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#ddd' }}>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Título da Entrega</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Data de Submissão</th>
-                        <th style={{ padding: '0.5rem', border: '1px solid #ccc' }}>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {dadosDaSprintSelecionada.entregas.map((entrega, idx) => (
-                        <tr key={idx}>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>{entrega.titulo_entrega}</td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>
-                            {entrega.data_submissao ? new Date(entrega.data_submissao).toLocaleDateString() : '-'}
-                            </td>
-                            <td style={{ padding: '0.5rem', border: '1px solid #ccc' }}>
-                            {entrega.link_repositorio && (
-                                <a href={entrega.link_repositorio} target="_blank" rel="noreferrer">
-                                Acessar o Repositório
-                                </a>
-                            )}
-                            </td>
-                        </tr>
-                        ))}
-                    </tbody>
-                    </table>
-                )}
+                <ListaEntregas entregas={dadosDaSprintSelecionada.entregas} />
                 </div>
             )}
         </div>
