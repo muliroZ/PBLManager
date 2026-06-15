@@ -1,77 +1,122 @@
-import os
-from pathlib import Path
-import psycopg2
-from dotenv import load_dotenv
+from flask import Flask, jsonify
+from flask_cors import CORS
+from init_db import get_db_connection
 
-load_dotenv()
+app = Flask(__name__)
+CORS(app)
 
-EXECUTION_ORDER = [
-    "scripts/criacao",
-    "scripts/functions",
-    "scripts/triggers",
-    "scripts/procedures",
-    "scripts/views",
-    "scripts/seeds",
-]
-
-def execute_sql_file(cursor, file_path):
+# ====================================
+# MÓDULO 1 (PAINEL GERAL)
+# ====================================
+@app.route('/api/equipes', methods=['GET'])
+def listar_equipes():
+    conn = None
+    cursor = None
     try:
-        with open(file_path, encoding="utf-8") as f:
-            sql_content = f.read()
-            if sql_content.strip():
-                cursor.execute(sql_content)
-    except Exception as e:
-        raise e
-
-def main():
-    db_user = os.getenv("POSTGRES_USER", "postgres")
-    db_password = os.getenv("POSTGRES_PASSWORD", "postgres")
-    db_name = os.getenv("POSTGRES_DB", "pblmanagerdb")
-    db_host = os.getenv("POSTGRES_HOST", "localhost")
-    db_port = os.getenv("POSTGRES_PORT", "5432")
-
-    base_dir = Path(__file__).parent
-
-    try:
-        conn = psycopg2.connect(
-            dbname=db_name,
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port
-        )
+        conn = get_db_connection()
         cursor = conn.cursor()
 
-        processed_files = set()
+        cursor.execute("SELECT * FROM vw_visao_geral_equipes;")
+        linhas = cursor.fetchall()
 
-        for folder_subpath in EXECUTION_ORDER:
-            target_folder = base_dir / folder_subpath
+        equipes_dict = {}
+        for linha in linhas:
+            codigo_equipe, nome_aluno, papel_aluno, nome_do_projeto, codigo_projeto = linha
 
-            if not target_folder.exists():
-                continue
+            if codigo_equipe not in equipes_dict:
+                equipes_dict[codigo_equipe] = {
+                    "codigo_equipe": codigo_equipe,
+                    "codigo_projeto": codigo_projeto,
+                    "nome_do_projeto": nome_do_projeto,
+                    "membros": []
+                }
 
-            sql_files = sorted([f for f in target_folder.glob("*.sql") if f.is_file()])
+            equipes_dict[codigo_equipe]["membros"].append({
+                "nome": nome_aluno,
+                "papel": papel_aluno
+            })
 
-            for file_path in sql_files:
-                if file_path in processed_files:
-                    continue
-
-                execute_sql_file(cursor, file_path)
-                processed_files.add(file_path)
-
-        conn.commit()
-
+        lista_final_equipes = list(equipes_dict.values())
+        return jsonify(lista_final_equipes), 200
+    
     except Exception as e:
-        print("erro: ", e)
-        if 'conn' in locals() and conn:
-            conn.rollback()
+        return jsonify({ "erro": f"Erro ao buscar equipes: {str(e)}" }), 500
     
     finally:
-        if 'cursor' in locals() and cursor:
+        if cursor:
             cursor.close()
+        if conn:
+            conn.close()
 
-        if 'conn' in locals() and conn:
+@app.route('/api/equipes/<int:id_equipe>/projeto/<int:projeto_id>/github', methods=['GET'])
+def repositorio_equipe():
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT obter_ultimo_github(%s, %s);")
+        resultado = cursor.fetchone()
+        
+        return jsonify({ "link_github": resultado }), 200
+    
+    except Exception as e:
+        return jsonify({ "erro": f"Erro ao buscar link do repositório: {str(e)}" }), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# ====================================
+# MÓDULO 2 (ACOMPANHAMENTO DE SPRINTS)
+# ====================================
+@app.route('/api/equipes/<int:equipe_id>/sprints', methods=['GET'])
+def listar_sprints_e_entregas(equipe_id):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(f"""
+            SELECT * FROM vw_acompanhamento_sprints 
+            WHERE codigo_equipe = {equipe_id};
+        """)
+        linhas = cursor.fetchall()
+
+        sprints = {}
+        for linha in linhas:
+            codigo_equipe, nome_projeto, numero_sprint, prazo_sprint, titulo_entrega, link_repositorio, data_submissao = linha
+
+            if numero_sprint not in sprints:
+                sprints[numero_sprint] = {
+                    "codigo_equipe": codigo_equipe,
+                    "nome_projeto": nome_projeto,
+                    "numero_sprint": numero_sprint,
+                    "prazo_sprint": prazo_sprint,
+                    "entregas": []
+                }
+
+            sprints[numero_sprint]["entregas"].append({
+                "titulo_entrega": titulo_entrega,
+                "link_repositorio": link_repositorio,
+                "data_submissao": data_submissao
+            })
+            
+        lista_final_sprints = list(sprints.values())
+        return jsonify(lista_final_sprints), 200
+    
+    except Exception as e:
+        return jsonify({ "erro": f"Erro ao buscar informações sobre as sprints: {str(e)}" }), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
             conn.close()
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", debug=True, port=5000)

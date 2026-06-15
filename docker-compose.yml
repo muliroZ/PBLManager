@@ -15,6 +15,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - pbl_manager
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -31,6 +36,31 @@ services:
       - "5050:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - pbl_manager
+
+  backend:
+    container_name: pbl_backend
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    networks:
+      - pbl_manager
+
+  frontend:
+    container_name: pbl_frontend
+    build: ./frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
     networks:
       - pbl_manager
 
